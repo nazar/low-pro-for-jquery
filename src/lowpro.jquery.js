@@ -176,7 +176,13 @@
         
       }, options || {});
     },
+    onupdate: function(data, status){
+      $(this.update).html(data);
+    },
     _makeRequest : function(options) {
+      if (this.options.update) {
+        options.success = this.onupdate;
+      }
       $.ajax(options);
       return false;
     }
