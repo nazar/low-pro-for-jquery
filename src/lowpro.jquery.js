@@ -190,8 +190,8 @@
       }
       if (request.options.evalScripts) {
         $('script', data).each(function() {
-//          script = this.text || this.textContent || this.innerHTML || ""
-          $.fbDebug(function(){console.debug('script: %o', script)});
+          script = this.text || this.textContent || this.innerHTML || ""
+//          $.fbDebug(function(){console.debug('script: %o', script)});
           try {
             request._evalScript(script);
           } catch(e) {
