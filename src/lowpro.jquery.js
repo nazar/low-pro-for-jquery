@@ -162,6 +162,14 @@
       return this.attached(behavior)[0];
     }
   });
+
+  $.extend({
+    fbDebug: function(callback) {
+      if (typeof(console) !== 'undefined') {
+        callback();
+      }
+    }
+  });
   
   Remote = $.klass({
     initialize: function(options) {
@@ -177,14 +185,30 @@
       }, options || {});
     },
     onupdate: function(data, status){
-      $(this.update).html(data);
+      if (request.options.update) {
+        $(request.options.update).html(data.replace(/<script(.|\s)*?\/script>/g, ""));
+      }
+      if (request.options.evalScripts) {
+        $('script', data).each(function() {
+//          script = this.text || this.textContent || this.innerHTML || ""
+          $.fbDebug(function(){console.debug('script: %o', script)});
+          try {
+            request._evalScript(script);
+          } catch(e) {
+            $.fbDebug(function(){console.error('exception: %o', e)});
+          }
+        });
+      }
+      return false;
     },
     _makeRequest : function(options) {
-      if (this.options.update) {
-        options.success = this.onupdate;
-      }
+      request = this; //define var for access in callbacks (ie onupdate)
+      options.success = options.onupdate || this.onupdate;
       $.ajax(options);
       return false;
+    },
+    _evalScript: function(script){
+      if (window.execScript) window.execScript(script); else eval.call(null, script); //fix ie gheyness
     }
   });
   
