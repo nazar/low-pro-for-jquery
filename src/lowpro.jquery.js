@@ -191,12 +191,7 @@
       if (request.options.evalScripts) {
         $('script', data).each(function() {
           script = this.text || this.textContent || this.innerHTML || ""
-//          $.fbDebug(function(){console.debug('script: %o', script)});
-          try {
-            request._evalScript(script);
-          } catch(e) {
-            $.fbDebug(function(){console.error('exception: %o', e)});
-          }
+          request._evalScript(script);
         });
       }
       return false;
@@ -208,7 +203,11 @@
       return false;
     },
     _evalScript: function(script){
-      if (window.execScript) window.execScript(script); else eval.call(null, script); //fix ie gheyness
+      try{
+        if (window.execScript) window.execScript(script); else eval.call(null, script); //fix ie gheyness
+      } catch(e){
+        $.fbDebug(function(){console.error('exception: %o', e)});
+      }
     }
   });
   
